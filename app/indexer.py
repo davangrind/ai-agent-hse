@@ -250,7 +250,7 @@ def _generate_description(title: str, file_type: str, content: str) -> str:
         f"Фрагмент документа:\n{excerpt}"
     )
     description = chat_completion(
-        "Ты анализируешь документы учебного офиса и кратко объясняешь их назначение.",
+        "Ты анализируешь документы и кратко объясняешь их назначение.",
         prompt,
         temperature=0.1,
         max_tokens=220,

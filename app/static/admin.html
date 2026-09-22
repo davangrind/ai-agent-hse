@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Учебный офис • Админ</title>
+    <title>Document RAG Assistant • Admin</title>
     <link rel="stylesheet" href="/static/styles.css?v=20260325-chat-center-3" />
   </head>
   <body>
@@ -11,9 +11,9 @@
       <div class="admin-canvas">
         <header class="admin-header">
           <p class="eyebrow">Admin dashboard</p>
-          <h1>Управление документами</h1>
+          <h1>Document management</h1>
           <p class="muted">
-            Закрытая панель для загрузки, редактирования и удаления документов базы знаний.
+            A protected dashboard for uploading, editing, and deleting documents in the knowledge base.
           </p>
         </header>
 
@@ -22,34 +22,34 @@
         <section class="admin-top-grid">
           <section class="panel admin-session-panel">
             <div class="panel-header">
-              <h2>Сессия</h2>
-              <span id="session-badge" class="status-pill">Проверка</span>
+              <h2>Session</h2>
+              <span id="session-badge" class="status-pill">Checking</span>
             </div>
-            <p class="tiny" id="session-status">Проверяем доступ к админ-панели.</p>
+            <p class="tiny" id="session-status">Checking access to the admin dashboard.</p>
             <div class="button-row">
-              <a href="/" class="secondary-button link-button">Пользовательская панель</a>
-              <button id="logout-button" class="secondary-button hidden" type="button">Выйти</button>
+              <a href="/" class="secondary-button link-button">User dashboard</a>
+              <button id="logout-button" class="secondary-button hidden" type="button">Sign out</button>
             </div>
           </section>
 
           <section class="hero admin-access-panel">
             <p class="eyebrow">Access</p>
-            <h2>Административный доступ</h2>
+            <h2>Administrative access</h2>
             <p class="muted">
-              Для CRUD-операций используется отдельная авторизация. Публичный дашборд и закрытая панель разделены.
+              CRUD operations require separate authentication. The public interface and protected dashboard are isolated.
             </p>
           </section>
         </section>
 
         <section id="login-panel" class="panel admin-form-panel">
           <div class="panel-header">
-            <h2>Вход</h2>
+            <h2>Sign in</h2>
           </div>
           <form id="login-form" class="stack-form">
-            <label class="input-label" for="admin-username">Логин</label>
+            <label class="input-label" for="admin-username">Username</label>
             <input id="admin-username" name="username" type="text" autocomplete="username" required />
 
-            <label class="input-label" for="admin-password">Пароль</label>
+            <label class="input-label" for="admin-password">Password</label>
             <input
               id="admin-password"
               name="password"
@@ -58,50 +58,50 @@
               required
             />
 
-            <button type="submit" class="primary-button">Войти</button>
+            <button type="submit" class="primary-button">Sign in</button>
           </form>
-          <p class="tiny" id="login-status">Вход разрешён только при настроенных `ADMIN_*` переменных.</p>
+          <p class="tiny" id="login-status">Sign-in is available only when the `ADMIN_*` variables are configured.</p>
         </section>
 
         <section class="admin-tools-grid">
           <section id="upload-panel" class="panel hidden">
             <div class="panel-header">
-              <h2>Загрузка</h2>
+              <h2>Upload</h2>
             </div>
             <form id="upload-form" class="stack-form">
-              <label class="input-label" for="upload-file">Файл</label>
+              <label class="input-label" for="upload-file">File</label>
               <input id="upload-file" name="file" type="file" required />
 
-              <label class="input-label" for="upload-description">Описание</label>
+              <label class="input-label" for="upload-description">Description</label>
               <textarea
                 id="upload-description"
                 name="description"
                 rows="4"
-                placeholder="Необязательно. Если пусто, описание сгенерирует индексатор."
+                placeholder="Optional. The indexer generates a description when this field is empty."
               ></textarea>
 
-              <button type="submit" class="primary-button">Загрузить документ</button>
+              <button type="submit" class="primary-button">Upload document</button>
             </form>
-            <p class="tiny" id="upload-status">Поддерживаются pdf, docx, dotx, xlsx, xls, csv.</p>
+            <p class="tiny" id="upload-status">Supported formats: pdf, docx, dotx, xlsx, xls, and csv.</p>
           </section>
 
           <section id="reindex-panel" class="panel hidden">
             <div class="panel-header">
-              <h2>Индексация</h2>
+              <h2>Indexing</h2>
             </div>
             <button id="admin-reindex-button" class="secondary-button" type="button">
-              Переиндексировать `docs`
+              Reindex `docs`
             </button>
-            <p class="tiny" id="admin-reindex-status">Запускает повторную индексацию каталога `DATA_DIR`.</p>
+            <p class="tiny" id="admin-reindex-status">Reindexes the configured `DATA_DIR` directory.</p>
           </section>
         </section>
 
         <section id="workspace-panel" class="panel hidden admin-workspace-panel">
           <div class="panel-header">
-            <h2>Документы</h2>
-            <button id="refresh-docs-button" class="secondary-button" type="button">Обновить список</button>
+            <h2>Documents</h2>
+            <button id="refresh-docs-button" class="secondary-button" type="button">Refresh list</button>
           </div>
-          <p class="tiny">Карточки показывают краткое описание. Подробности и редактирование открываются в отдельном окне.</p>
+          <p class="tiny">Cards show a short description. Open a document to see details or edit its metadata.</p>
           <div id="admin-docs" class="admin-docs-list"></div>
         </section>
       </div>
@@ -111,10 +111,10 @@
       <div class="modal-card">
         <div class="panel-header">
           <div>
-            <p class="eyebrow" id="doc-modal-type">Документ</p>
-            <h2 id="doc-modal-title">Подробности</h2>
+            <p class="eyebrow" id="doc-modal-type">Document</p>
+            <h2 id="doc-modal-title">Details</h2>
           </div>
-          <button id="doc-modal-close" class="secondary-button" type="button">Закрыть</button>
+          <button id="doc-modal-close" class="secondary-button" type="button">Close</button>
         </div>
 
         <p class="meta" id="doc-modal-path"></p>
@@ -122,24 +122,24 @@
 
         <div class="source-actions">
           <a id="doc-modal-open" class="secondary-button link-button" href="#" target="_blank" rel="noopener noreferrer">
-            Открыть
+            Open
           </a>
           <a id="doc-modal-download" class="secondary-button link-button" href="#">
-            Скачать
+            Download
           </a>
-          <button id="doc-modal-delete" class="secondary-button danger-button" type="button">Удалить</button>
+          <button id="doc-modal-delete" class="secondary-button danger-button" type="button">Delete</button>
         </div>
 
         <form id="doc-modal-form" class="stack-form">
-          <label class="input-label" for="doc-modal-title-input">Название документа</label>
+          <label class="input-label" for="doc-modal-title-input">Document title</label>
           <input id="doc-modal-title-input" name="title" type="text" required />
 
-          <label class="input-label" for="doc-modal-description-input">Описание</label>
+          <label class="input-label" for="doc-modal-description-input">Description</label>
           <textarea id="doc-modal-description-input" name="description" rows="8"></textarea>
 
           <div class="button-row">
-            <button class="primary-button" type="submit">Сохранить</button>
-            <span class="tiny" id="doc-modal-status">Выбери документ для редактирования.</span>
+            <button class="primary-button" type="submit">Save</button>
+            <span class="tiny" id="doc-modal-status">Select a document to edit.</span>
           </div>
         </form>
       </div>

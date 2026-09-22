@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Учебный офис</title>
+    <title>Document RAG Assistant</title>
     <link rel="stylesheet" href="/static/styles.css?v=20260325-chat-center-3" />
   </head>
   <body>
@@ -14,55 +14,55 @@
       >
         <aside class="sidebar" style="display:flex;flex-direction:column;gap:20px;">
           <section class="panel brand-panel">
-            <p class="eyebrow">Учебный офис</p>
-            <h2>Навигация и действия</h2>
+            <p class="eyebrow">Document assistant</p>
+            <h2>Navigation and actions</h2>
             <p class="muted">
-              Слева находятся служебные панели. Основной сценарий работы расположен в центре страницы в формате чата.
+              Use the utility panels on the left and ask questions in the document chat.
             </p>
           </section>
 
           <section class="panel">
             <div class="panel-header">
-              <h2>Система</h2>
+              <h2>System</h2>
             </div>
             <p class="muted">
-              Ответы строятся по найденным фрагментам. Если LLM не настроен, сервис всё равно покажет найденные материалы.
+              Answers are grounded in retrieved passages. If no LLM is configured, the service still shows matching material.
             </p>
             <div class="stats-grid" id="stats"></div>
           </section>
 
           <section class="panel">
             <div class="panel-header">
-              <h2>Действия</h2>
+              <h2>Actions</h2>
             </div>
             <div class="button-stack">
-              <button id="open-docs-modal-button" class="secondary-button" type="button">Документы базы</button>
-              <a href="/admin" class="secondary-button link-button">Открыть админ-панель</a>
+              <button id="open-docs-modal-button" class="secondary-button" type="button">Document library</button>
+              <a href="/admin" class="secondary-button link-button">Open admin dashboard</a>
             </div>
-            <p class="tiny">Переиндексация и управление документами перенесены в административную панель.</p>
+            <p class="tiny">Use the admin dashboard to manage and reindex documents.</p>
           </section>
         </aside>
 
         <section class="chat-stage" style="display:flex;justify-content:center;min-width:0;">
           <section class="chat-panel" style="display:flex;flex-direction:column;gap:20px;width:min(100%,960px);min-width:0;">
             <header class="hero">
-              <p class="eyebrow">Чат</p>
-              <h1>Чат по базе документов</h1>
+              <p class="eyebrow">Chat</p>
+              <h1>Ask your document library</h1>
               <p class="muted">
-                Интерфейс выглядит как чат, но не сохраняет контекст диалога: каждый вопрос отправляется как отдельный запрос к базе документов.
+                Each message is processed as an independent query; conversation context is not retained.
               </p>
               <div class="hero-meta">
-                <span id="answer-status" class="status-pill">Готов</span>
-                <span class="tiny">Источники прикрепляются к каждому ответу отдельно.</span>
+                <span id="answer-status" class="status-pill">Ready</span>
+                <span class="tiny">Supporting sources are attached to each answer.</span>
               </div>
             </header>
 
             <section id="chat-thread" class="chat-thread" aria-live="polite">
               <article class="message message-assistant message-welcome">
-                <div class="message-role">Ассистент</div>
+                <div class="message-role">Assistant</div>
                 <div class="message-card">
                   <p class="message-text">
-                    Задайте вопрос по локальной базе документов. Для надёжности формулируйте каждый запрос полностью, без расчёта на память предыдущих сообщений.
+                    Ask a question about the local document library. Include all relevant details in each message.
                   </p>
                 </div>
               </article>
@@ -70,16 +70,16 @@
 
             <section class="composer-shell">
               <div class="context-warning">
-                Контекст не переносится между сообщениями. Если вопрос зависит от прошлого ответа, повторите нужные детали в новом сообщении.
+                Context is not carried between messages. Repeat any relevant details from earlier answers.
               </div>
 
               <form id="ask-form" class="composer-form">
-                <label class="sr-only" for="question">Вопрос</label>
+                <label class="sr-only" for="question">Question</label>
                 <textarea
                   id="question"
                   name="question"
                   rows="3"
-                  placeholder="Например: когда проходит сессия 3 модуля и какие даты указаны в расписании?"
+                  placeholder="For example: what deadlines and requirements are listed in the policy?"
                   required
                 ></textarea>
                 <div class="composer-actions">
@@ -87,7 +87,7 @@
                     <span>Top K</span>
                     <input id="top-k" type="number" min="1" max="20" value="8" />
                   </label>
-                  <button type="submit" class="primary-button">Отправить</button>
+                  <button type="submit" class="primary-button">Send</button>
                 </div>
               </form>
             </section>
@@ -106,13 +106,13 @@
       <div class="modal-card">
         <div class="panel-header">
           <div>
-            <p class="eyebrow">Каталог</p>
-            <h2 id="docs-modal-title">Документы базы</h2>
+            <p class="eyebrow">Library</p>
+            <h2 id="docs-modal-title">Indexed documents</h2>
           </div>
-          <button id="docs-modal-close" class="secondary-button" type="button">Закрыть</button>
+          <button id="docs-modal-close" class="secondary-button" type="button">Close</button>
         </div>
         <p class="muted">
-          Здесь перечислены документы, по которым строятся ответы. Для управления составом базы используйте админ-панель.
+          These documents provide the source material for answers. Use the admin dashboard to manage the library.
         </p>
         <div id="docs" class="docs-list"></div>
       </div>

@@ -40,19 +40,19 @@ function dedupeSources(sources) {
 function renderStats(stats) {
   statsEl.innerHTML = `
     <div class="stat-card">
-      <span>Документы</span>
+      <span>Documents</span>
       <strong>${stats.docs_count}</strong>
     </div>
     <div class="stat-card">
-      <span>Чанки</span>
+      <span>Chunks</span>
       <strong>${stats.chunks_count}</strong>
     </div>
     <div class="stat-card">
-      <span>Чат</span>
+      <span>Chat</span>
       <strong>ON</strong>
     </div>
     <div class="stat-card">
-      <span>Статус</span>
+      <span>Status</span>
       <strong>OK</strong>
     </div>
   `;
@@ -61,12 +61,12 @@ function renderStats(stats) {
 function buildSourcesMarkup(sources) {
   const uniqueSources = dedupeSources(sources);
   if (!uniqueSources.length) {
-    return `<div class="empty-state">Источники не найдены для этого ответа.</div>`;
+    return `<div class="empty-state">No sources were found for this answer.</div>`;
   }
 
   return `
     <div class="message-sources">
-      <p class="message-sources-title">Источники</p>
+      <p class="message-sources-title">Sources</p>
       <div class="sources-list">
         ${uniqueSources
           .map(
@@ -85,14 +85,14 @@ function buildSourcesMarkup(sources) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Открыть документ
+                    Open document
                   </a>`
                     : ""}
                   <a
                     class="secondary-button link-button"
                     href="/api/docs/${encodeURIComponent(source.doc_id)}/file?download=true"
                   >
-                    Скачать
+                    Download
                   </a>
                 </div>
               </article>
@@ -108,7 +108,7 @@ function appendMessage({ role, text, sources = [], pending = false }) {
   const wrapper = document.createElement("article");
   wrapper.className = `message message-${role}`;
 
-  const roleLabel = role === "user" ? "Вы" : "Ассистент";
+  const roleLabel = role === "user" ? "You" : "Assistant";
   wrapper.innerHTML = `
     <div class="message-role">${roleLabel}</div>
     <div class="message-card">
@@ -124,7 +124,7 @@ function appendMessage({ role, text, sources = [], pending = false }) {
 
 function renderDocs(items) {
   if (!items.length) {
-    renderEmpty(docsEl, "Документы пока не найдены.");
+    renderEmpty(docsEl, "No documents have been indexed yet.");
     return;
   }
 
@@ -144,14 +144,14 @@ function renderDocs(items) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Открыть
+              Open
             </a>`
               : ""}
             <a
               class="secondary-button link-button"
               href="/api/docs/${encodeURIComponent(item.id)}/file?download=true"
             >
-              Скачать
+              Download
             </a>
           </div>
         </article>
@@ -206,11 +206,11 @@ async function askQuestion(event) {
   appendMessage({ role: "user", text: question });
   const pendingMessage = appendMessage({
     role: "assistant",
-    text: "Ищу релевантные фрагменты и формирую ответ...",
+    text: "Searching for relevant passages and preparing an answer...",
     pending: true,
   });
 
-  answerStatusEl.textContent = "Ищу";
+  answerStatusEl.textContent = "Searching";
   answerStatusEl.classList.add("pending");
   questionInput.value = "";
 
@@ -223,8 +223,8 @@ async function askQuestion(event) {
 
   if (!response.ok) {
     pendingMessage.querySelector(".answer-output").textContent =
-      payload.detail || "Не удалось получить ответ.";
-    answerStatusEl.textContent = "Ошибка";
+      payload.detail || "Unable to retrieve an answer.";
+    answerStatusEl.textContent = "Error";
     answerStatusEl.classList.remove("pending");
     return;
   }
@@ -233,7 +233,7 @@ async function askQuestion(event) {
     <pre class="answer-output">${escapeHtml(payload.answer)}</pre>
     ${buildSourcesMarkup(payload.sources || [])}
   `;
-  answerStatusEl.textContent = "Готов";
+  answerStatusEl.textContent = "Ready";
   answerStatusEl.classList.remove("pending");
 
   await loadStats();
@@ -245,6 +245,6 @@ docsModalCloseEl.addEventListener("click", closeDocsModal);
 docsModalEl.addEventListener("click", handleDocsModalBackdrop);
 document.addEventListener("keydown", handleEscape);
 
-renderEmpty(docsEl, "Загружаем список документов...");
+renderEmpty(docsEl, "Loading documents...");
 loadStats();
 loadDocs();

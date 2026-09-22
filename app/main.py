@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 
-app = FastAPI(title="RAG Учебный офис", version="0.3.0")
+app = FastAPI(title="Document RAG Assistant", version="0.3.0")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 

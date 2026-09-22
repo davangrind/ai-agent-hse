@@ -36,11 +36,11 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 logger = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
-BUTTON_ASK = "Задать вопрос"
-BUTTON_DOCS = "Документы"
-BUTTON_TOPICS = "Частые темы"
-BUTTON_HELP = "Как пользоваться"
-BUTTON_MENU = "В меню"
+BUTTON_ASK = "Ask a question"
+BUTTON_DOCS = "Documents"
+BUTTON_TOPICS = "Common topics"
+BUTTON_HELP = "How to use"
+BUTTON_MENU = "Main menu"
 
 CALLBACK_MENU = "menu"
 CALLBACK_TOPIC_PREFIX = "topic:"
@@ -52,12 +52,12 @@ MAX_STORED_SOURCE_SETS = 20
 
 TOPIC_QUERIES = OrderedDict(
     [
-        ("transfer", ("Перевод", "Каков порядок перевода студентов?")),
-        ("session", ("Сессия", "Когда проходит сессия 3 модуля?")),
-        ("vkr", ("ВКР", "Какие правила действуют для ВКР?")),
-        ("schedule", ("Расписание", "Какое расписание занятий на текущую неделю?")),
-        ("sport", ("Физкультура", "Каков порядок проведения занятий по физической культуре?")),
-        ("charter", ("Устав", "Какие общие правила и нормы закреплены в уставе?")),
+        ("policies", ("Policies", "What policies are described in the document library?")),
+        ("procedures", ("Procedures", "What procedures are described in the documents?")),
+        ("deadlines", ("Deadlines", "What dates and deadlines are listed in the documents?")),
+        ("requirements", ("Requirements", "What requirements are stated in the documents?")),
+        ("contacts", ("Contacts", "What contact information is available in the documents?")),
+        ("forms", ("Forms", "What forms or templates are available in the document library?")),
     ]
 )
 
@@ -90,7 +90,7 @@ def _main_menu_markup() -> ReplyKeyboardMarkup:
             [BUTTON_TOPICS, BUTTON_HELP],
         ],
         resize_keyboard=True,
-        input_field_placeholder="Выберите действие или просто напишите вопрос",
+        input_field_placeholder="Choose an action or type a question",
     )
 
 
@@ -98,7 +98,7 @@ def _answer_actions_markup(source_key: str | None) -> InlineKeyboardMarkup:
     buttons = []
     if source_key:
         buttons.append(
-            [InlineKeyboardButton("Показать источники", callback_data=f"{CALLBACK_SOURCES_PREFIX}{source_key}")]
+            [InlineKeyboardButton("Show sources", callback_data=f"{CALLBACK_SOURCES_PREFIX}{source_key}")]
         )
     buttons.append([InlineKeyboardButton(BUTTON_MENU, callback_data=CALLBACK_MENU)])
     return InlineKeyboardMarkup(buttons)
@@ -120,25 +120,25 @@ def _documents_markup(page: int, has_more: bool) -> InlineKeyboardMarkup:
     buttons = []
     if has_more:
         buttons.append(
-            [InlineKeyboardButton("Показать еще", callback_data=f"{CALLBACK_DOCS_PREFIX}{page + 1}")]
+            [InlineKeyboardButton("Show more", callback_data=f"{CALLBACK_DOCS_PREFIX}{page + 1}")]
         )
     if page > 0:
-        buttons.append([InlineKeyboardButton("Сначала", callback_data=f"{CALLBACK_DOCS_PREFIX}0")])
+        buttons.append([InlineKeyboardButton("Back to first page", callback_data=f"{CALLBACK_DOCS_PREFIX}0")])
     buttons.append([InlineKeyboardButton(BUTTON_MENU, callback_data=CALLBACK_MENU)])
     return InlineKeyboardMarkup(buttons)
 
 
 def _format_help_text() -> str:
     return (
-        "Я отвечаю на вопросы по документам учебного офиса.\n\n"
-        "Как пользоваться:\n"
-        "1. Нажмите «Задать вопрос» или просто отправьте сообщение.\n"
-        "2. Формулируйте вопрос конкретно: например, про перевод, сессию или ВКР.\n"
-        "3. Если нужны подтверждения, откройте источники по кнопке после ответа.\n\n"
-        "Примеры вопросов:\n"
-        "- Когда проходит сессия 3 модуля?\n"
-        "- Какие правила перевода студентов?\n"
-        "- Что сказано в документах про ВКР?"
+        "I answer questions using the indexed document library.\n\n"
+        "How to use the bot:\n"
+        "1. Select ‘Ask a question’ or send a message directly.\n"
+        "2. Make the question specific and include all relevant details.\n"
+        "3. Use the sources button after an answer to inspect supporting passages.\n\n"
+        "Example questions:\n"
+        "- What deadlines are listed in the documents?\n"
+        "- What steps does the described procedure require?\n"
+        "- Which document defines this policy?"
     )
 
 
@@ -164,10 +164,10 @@ def _fetch_documents(page: int) -> tuple[list[Doc], bool]:
 def _format_documents_text(page: int, docs: list[Doc]) -> str:
     if not docs:
         if page == 0:
-            return "В базе пока нет документов."
-        return "Больше документов не найдено."
+            return "The library does not contain any documents yet."
+        return "No more documents were found."
 
-    lines = [f"Документы, страница {page + 1}:"]
+    lines = [f"Documents, page {page + 1}:"]
     start_number = page * DOCS_PAGE_SIZE + 1
     for index, doc in enumerate(docs, start=start_number):
         lines.append(f"{index}. {doc.title}")
@@ -188,11 +188,11 @@ def _remember_sources(context: ContextTypes.DEFAULT_TYPE, sources) -> str | None
 
 def _format_sources_text(source_items: list[dict]) -> str:
     if not source_items:
-        return "Источники для этого ответа не найдены."
+        return "No sources were found for this answer."
 
-    lines = ["Источники:"]
+    lines = ["Sources:"]
     for index, source in enumerate(source_items[:5], start=1):
-        lines.append(f"{index}. {source['title']}, фрагмент #{source['chunk_index']}")
+        lines.append(f"{index}. {source['title']}, passage #{source['chunk_index']}")
         lines.append(f"   {source['snippet']}")
     return "\n".join(lines)
 
@@ -214,7 +214,7 @@ async def _clear_inline_markup(query) -> None:
 
 async def _show_menu(message) -> None:
     await message.reply_text(
-        "Главное меню. Выберите действие или просто напишите вопрос.",
+        "Main menu. Choose an action or type a question.",
         reply_markup=_main_menu_markup(),
     )
 
@@ -225,7 +225,7 @@ async def _show_help(message) -> None:
 
 async def _show_topics(message) -> None:
     await message.reply_text(
-        "Выберите частую тему. Я сразу отправлю соответствующий запрос в базу документов.",
+        "Choose a common topic to search the document library.",
         reply_markup=_topics_markup(),
     )
 
@@ -273,7 +273,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not await _is_allowed(update):
         return
     await update.message.reply_text(
-        "Привет. Я бот учебного офиса. Выберите действие в меню или сразу напишите вопрос по документам.",
+        "Hello. I answer questions using the indexed document library. Choose an action or type a question.",
         reply_markup=_main_menu_markup(),
     )
 
@@ -304,13 +304,13 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         topic_key = data.removeprefix(CALLBACK_TOPIC_PREFIX)
         topic = TOPIC_QUERIES.get(topic_key)
         if not topic:
-            await query.message.reply_text("Не удалось определить тему. Вернитесь в меню и попробуйте снова.")
+            await query.message.reply_text("The topic could not be identified. Return to the menu and try again.")
             return
 
         await _clear_inline_markup(query)
         label, question = topic
         await query.message.reply_text(
-            f"Тема: {label}\nОбрабатываю готовый запрос: {question}",
+            f"Topic: {label}\nProcessing: {question}",
             reply_markup=_main_menu_markup(),
         )
         await _send_answer(
@@ -343,7 +343,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         )
         return
 
-    await query.message.reply_text("Команда не распознана. Вернитесь в меню.", reply_markup=_main_menu_markup())
+    await query.message.reply_text("Command not recognized. Return to the main menu.", reply_markup=_main_menu_markup())
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -358,7 +358,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     if text == BUTTON_ASK:
         await update.message.reply_text(
-            "Напишите вопрос по документам учебного офиса. Можно сразу одним сообщением.",
+            "Type a question about the indexed documents. Include all relevant details in one message.",
             reply_markup=_main_menu_markup(),
         )
         return

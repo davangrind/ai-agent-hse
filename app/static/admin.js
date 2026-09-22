@@ -44,7 +44,7 @@ function renderEmpty(container, text) {
 function previewText(value, limit = 180) {
   const text = String(value || "").trim();
   if (!text) {
-    return "Описание пока пустое.";
+    return "No description is available yet.";
   }
   if (text.length <= limit) {
     return text;
@@ -55,19 +55,19 @@ function previewText(value, limit = 180) {
 function renderStats({ enabled, authenticated, username }) {
   statsEl.innerHTML = `
     <div class="stat-card">
-      <span>Админ auth</span>
+      <span>Admin auth</span>
       <strong>${enabled ? "ON" : "OFF"}</strong>
     </div>
     <div class="stat-card">
-      <span>Сессия</span>
+      <span>Session</span>
       <strong>${authenticated ? "OK" : "LOCK"}</strong>
     </div>
     <div class="stat-card">
-      <span>Пользователь</span>
+      <span>User</span>
       <strong>${escapeHtml(username || "guest")}</strong>
     </div>
     <div class="stat-card">
-      <span>Панель</span>
+      <span>Dashboard</span>
       <strong>CRUD</strong>
     </div>
   `;
@@ -79,8 +79,8 @@ function setSessionState(session) {
     logoutButtonEl.classList.add("hidden");
     sessionBadgeEl.textContent = "OFF";
     sessionStatusEl.textContent =
-      "Админ-доступ не настроен. Заполни ADMIN_USERNAME, ADMIN_PASSWORD и ADMIN_SESSION_SECRET.";
-    loginStatusEl.textContent = "Сервер не настроен для админ-входа.";
+      "Admin access is not configured. Set ADMIN_USERNAME, ADMIN_PASSWORD, and ADMIN_SESSION_SECRET.";
+    loginStatusEl.textContent = "The server is not configured for admin sign-in.";
     loginPanelEl.classList.remove("hidden");
     workspacePanelEl.classList.add("hidden");
     uploadPanelEl.classList.add("hidden");
@@ -91,8 +91,8 @@ function setSessionState(session) {
 
   if (session.authenticated) {
     logoutButtonEl.classList.remove("hidden");
-    sessionBadgeEl.textContent = "Доступ";
-    sessionStatusEl.textContent = `Выполнен вход как ${session.username}. CRUD-эндпоинты разблокированы.`;
+    sessionBadgeEl.textContent = "Access";
+    sessionStatusEl.textContent = `Signed in as ${session.username}. CRUD endpoints are unlocked.`;
     loginPanelEl.classList.add("hidden");
     workspacePanelEl.classList.remove("hidden");
     uploadPanelEl.classList.remove("hidden");
@@ -101,8 +101,8 @@ function setSessionState(session) {
   }
 
   logoutButtonEl.classList.add("hidden");
-  sessionBadgeEl.textContent = "Вход";
-  sessionStatusEl.textContent = "Требуется авторизация администратора.";
+  sessionBadgeEl.textContent = "Sign in";
+  sessionStatusEl.textContent = "Administrator authentication is required.";
   loginPanelEl.classList.remove("hidden");
   workspacePanelEl.classList.add("hidden");
   uploadPanelEl.classList.add("hidden");
@@ -132,7 +132,7 @@ function renderDocs(items) {
   items.forEach((item) => docsState.set(item.id, item));
 
   if (!items.length) {
-    renderEmpty(docsEl, "Документов пока нет.");
+    renderEmpty(docsEl, "No documents have been indexed yet.");
     return;
   }
 
@@ -144,8 +144,8 @@ function renderDocs(items) {
           <h3>${escapeHtml(item.title)}</h3>
           <p class="meta">${escapeHtml(previewText(item.description))}</p>
           <div class="admin-doc-summary-footer">
-            <span class="tiny">Обновлено: ${new Date(item.updated_at).toLocaleString("ru-RU")}</span>
-            <button class="secondary-button" type="button" data-action="open-modal">Подробнее</button>
+            <span class="tiny">Updated: ${new Date(item.updated_at).toLocaleString("en-US")}</span>
+            <button class="secondary-button" type="button" data-action="open-modal">Details</button>
           </div>
         </article>
       `,
@@ -163,13 +163,13 @@ function openDocModal(docId) {
   modalTypeEl.textContent = doc.file_type;
   modalTitleEl.textContent = doc.title;
   modalPathEl.textContent = doc.file_path;
-  modalPreviewEl.textContent = doc.description || "Описание пока пустое.";
+  modalPreviewEl.textContent = doc.description || "No description is available yet.";
   modalTitleInputEl.value = doc.title || "";
   modalDescriptionInputEl.value = doc.description || "";
   modalOpenEl.href = `/api/docs/${encodeURIComponent(doc.id)}/file`;
   modalDownloadEl.href = `/api/docs/${encodeURIComponent(doc.id)}/file?download=true`;
   modalOpenEl.classList.toggle("hidden", !doc.can_preview);
-  modalStatusEl.textContent = `Последнее обновление: ${new Date(doc.updated_at).toLocaleString("ru-RU")}`;
+  modalStatusEl.textContent = `Last updated: ${new Date(doc.updated_at).toLocaleString("en-US")}`;
   modalEl.classList.remove("hidden");
   document.body.classList.add("modal-open");
 }
@@ -179,7 +179,7 @@ function closeDocModal() {
   modalEl.classList.add("hidden");
   document.body.classList.remove("modal-open");
   modalFormEl.reset();
-  modalStatusEl.textContent = "Выбери документ для редактирования.";
+  modalStatusEl.textContent = "Select a document to edit.";
 }
 
 async function loadDocs() {
@@ -189,7 +189,7 @@ async function loadDocs() {
   } catch (error) {
     if (error.message.includes("authentication")) {
       await loadSession();
-      renderEmpty(docsEl, "Список документов станет доступен после входа.");
+      renderEmpty(docsEl, "The document list is available after sign-in.");
       return;
     }
     renderEmpty(docsEl, error.message);
@@ -198,7 +198,7 @@ async function loadDocs() {
 
 async function handleLogin(event) {
   event.preventDefault();
-  loginStatusEl.textContent = "Проверяем учётные данные...";
+  loginStatusEl.textContent = "Checking credentials...";
 
   const form = new FormData(event.currentTarget);
   try {
@@ -210,7 +210,7 @@ async function handleLogin(event) {
         password: String(form.get("password") || ""),
       }),
     });
-    loginStatusEl.textContent = "Вход выполнен.";
+    loginStatusEl.textContent = "Signed in.";
     await loadSession();
     await loadDocs();
   } catch (error) {
@@ -221,13 +221,13 @@ async function handleLogin(event) {
 async function handleLogout() {
   await getJson("/admin/logout", { method: "POST" });
   await loadSession();
-  renderEmpty(docsEl, "Список документов станет доступен после входа.");
+  renderEmpty(docsEl, "The document list is available after sign-in.");
 }
 
 async function handleUpload(event) {
   event.preventDefault();
   const formEl = event.currentTarget;
-  uploadStatusEl.textContent = "Загружаем документ и индексируем...";
+  uploadStatusEl.textContent = "Uploading and indexing the document...";
   const form = new FormData(formEl);
 
   try {
@@ -236,7 +236,7 @@ async function handleUpload(event) {
       body: form,
     });
     formEl.reset();
-    uploadStatusEl.textContent = "Документ загружен.";
+    uploadStatusEl.textContent = "Document uploaded.";
     await loadDocs();
   } catch (error) {
     uploadStatusEl.textContent = error.message;
@@ -244,7 +244,7 @@ async function handleUpload(event) {
 }
 
 async function handleReindex() {
-  reindexStatusEl.textContent = "Индексирование запущено...";
+  reindexStatusEl.textContent = "Indexing started...";
   try {
     const payload = await getJson("/admin/api/reindex", {
       method: "POST",
@@ -252,7 +252,7 @@ async function handleReindex() {
       body: JSON.stringify({}),
     });
     reindexStatusEl.textContent =
-      `Новых: ${payload.indexed_docs}, обновлено: ${payload.updated_docs}, пропущено: ${payload.skipped_docs}`;
+      `New: ${payload.indexed_docs}, updated: ${payload.updated_docs}, skipped: ${payload.skipped_docs}`;
     await loadDocs();
   } catch (error) {
     reindexStatusEl.textContent = error.message;
@@ -277,7 +277,7 @@ async function handleModalSubmit(event) {
     return;
   }
 
-  modalStatusEl.textContent = "Сохраняем изменения...";
+  modalStatusEl.textContent = "Saving changes...";
   try {
     const updated = await getJson(`/admin/api/docs/${activeDocId}`, {
       method: "PATCH",
@@ -290,8 +290,8 @@ async function handleModalSubmit(event) {
 
     docsState.set(updated.id, updated);
     modalTitleEl.textContent = updated.title;
-    modalPreviewEl.textContent = updated.description || "Описание пока пустое.";
-    modalStatusEl.textContent = `Сохранено: ${new Date(updated.updated_at).toLocaleString("ru-RU")}`;
+    modalPreviewEl.textContent = updated.description || "No description is available yet.";
+    modalStatusEl.textContent = `Saved: ${new Date(updated.updated_at).toLocaleString("en-US")}`;
     renderDocs(Array.from(docsState.values()));
   } catch (error) {
     modalStatusEl.textContent = error.message;
@@ -303,10 +303,10 @@ async function handleModalDelete() {
     return;
   }
 
-  modalStatusEl.textContent = "Удаляем документ...";
+  modalStatusEl.textContent = "Deleting document...";
   const response = await fetch(`/admin/api/docs/${activeDocId}`, { method: "DELETE" });
   if (!response.ok) {
-    modalStatusEl.textContent = "Не удалось удалить документ.";
+    modalStatusEl.textContent = "Unable to delete the document.";
     return;
   }
 
@@ -339,7 +339,7 @@ modalFormEl.addEventListener("submit", handleModalSubmit);
 modalEl.addEventListener("click", handleModalBackdrop);
 document.addEventListener("keydown", handleEscape);
 
-renderEmpty(docsEl, "Список документов станет доступен после входа.");
+renderEmpty(docsEl, "The document list is available after sign-in.");
 loadSession().then((session) => {
   if (session.authenticated) {
     loadDocs();
